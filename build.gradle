@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	testCompile group: 'junit', name: 'junit', version: '4.0'
+	compile 'com.google.guava:guava:18.0'
+}
+
+compileJava {
+	options.fork = true
+	sourceCompatibility = "1.7"
+	targetCompatibility = "1.7"
+}
+
+javadoc {
+	include 'net/magik6k/bitbuffer/**'
+}
+
+test {
+	include 'net/magik6k/bitbuffer/**'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	from 'build/docs/javadoc'
+	classifier 'javadoc'
+}
+
