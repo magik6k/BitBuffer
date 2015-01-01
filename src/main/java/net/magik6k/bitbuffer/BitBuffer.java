@@ -1,6 +1,7 @@
 package net.magik6k.bitbuffer;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import com.google.common.base.Charsets;
 
@@ -291,7 +292,7 @@ public abstract class BitBuffer {
 		for(int i = 0; i < length; ++i){
 			bytes[i] = getByte();
 		}
-		return new String(bytes, Charsets.UTF_8);
+		return new String(bytes, StandardCharsets.UTF_8);
 	}
 	
 	/**
@@ -304,7 +305,7 @@ public abstract class BitBuffer {
 		for(int i = 0; i < length; ++i){
 			bytes[i] = getByte(bitsPerChar);
 		}
-		return new String(bytes, Charsets.UTF_8);
+		return new String(bytes, StandardCharsets.UTF_8);
 	}
 	
 	/**
