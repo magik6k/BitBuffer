@@ -21,7 +21,7 @@ public abstract class BitBuffer {
 	
 	/**
 	 * Puts byte value with specified bit count. Note that this
-	 * method can only be used with positive numbers or zero.
+	 * method can only be used with only positive numbers or zero.
 	 * @param b value to set
 	 * @param bits Number of bits to use
 	 * @return This buffer
@@ -42,8 +42,25 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * Puts long value(64 bits)
+	 * @param l value to set
+	 * @return This buffer
+	 */
+	public BitBuffer putLong(long l){
+		putByte((byte)((l&0xFF00000000000000L)>>>56L));
+		putByte((byte)((l&0x00FF000000000000L)>>>48L));
+		putByte((byte)((l&0x0000FF0000000000L)>>>40L));
+		putByte((byte)((l&0x000000FF00000000L)>>>32L));
+		putByte((byte)((l&0x00000000FF000000L)>>>24L));
+		putByte((byte)((l&0x0000000000FF0000L)>>>16L));
+		putByte((byte)((l&0x000000000000FF00L)>>>8L));
+		putByte((byte) (l&0x00000000000000FFL));
+		return this;
+	}
+	
+	/**
 	 * Puts integer value with specified bit count. Note that this
-	 * method can only be used with positive numbers or zero.
+	 * method can only be used only with positive numbers or zero.
 	 * @param i value to set
 	 * @param bits Number of bits to use
 	 * @return This buffer
@@ -63,13 +80,43 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * Puts long value with specified bit count. Note that this
+	 * method can only be used only with positive numbers or zero.
+	 * @param l value to set
+	 * @param bits Number of bits to use
+	 * @return This buffer
+	 */
+	public BitBuffer putLong(long l, int bits){
+		if(bits == 0)return this;
+		do{
+			if(bits > 7){
+				putByte((byte) ((l&(0xFF << (bits - 8))) >>> (bits - 8) ));
+				bits -= 8;
+			}else{
+				putByte((byte) (l & (0xFF >> -(bits - 8))), bits);
+				bits = 0;
+			}
+		}while(bits > 0);
+		return this;
+	}
+	
+	/**
 	 * Puts floating point value(32 bits)
 	 * @param f value to set
 	 * @return This buffer
 	 */
 	public BitBuffer putFloat(float f){
-		int asInt = Float.floatToRawIntBits(f);
-		putInt(asInt);
+		putInt(Float.floatToRawIntBits(f));
+		return this;
+	}
+	
+	/**
+	 * Puts double floating point value(64 bits)
+	 * @param d value to set
+	 * @return This buffer
+	 */
+	public BitBuffer putDouble(double d){
+		putLong(Double.doubleToLongBits(d));
 		return this;
 	}
 	
