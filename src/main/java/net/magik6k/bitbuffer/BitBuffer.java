@@ -13,6 +13,15 @@ public abstract class BitBuffer {
 	public abstract BitBuffer putBoolean(boolean b);
 	
 	/**
+	 * Puts single bit(boolean value) to this buffer
+	 * @param bit value to set
+	 * @return This buffer
+	 */
+	public BitBuffer putBit(boolean bit){
+		return putBoolean(bit);
+	}
+	
+	/**
 	 * Puts byte value(8 bits)
 	 * @param b value to set
 	 * @return This buffer
@@ -89,11 +98,11 @@ public abstract class BitBuffer {
 	public BitBuffer putLong(long l, int bits){
 		if(bits == 0)return this;
 		do{
-			if(bits > 7){
-				putByte((byte) ((l&(0xFF << (bits - 8))) >>> (bits - 8) ));
-				bits -= 8;
+			if(bits > 31){
+				putInt((int) ((l&(0xFFFFFFFFL << (bits - 32L))) >>> (bits - 32L) ));
+				bits -= 32;
 			}else{
-				putByte((byte) (l & (0xFF >> -(bits - 8))), bits);
+				putInt((int) (l & (0xFFFFFFFFL >> -(bits - 32L))), bits);
 				bits = 0;
 			}
 		}while(bits > 0);
@@ -146,6 +155,51 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * @see #putBoolean(boolean)
+	 * @param bit value to set
+	 * @return This buffer
+	 */
+	public BitBuffer put(boolean bit){
+		return putBoolean(bit);
+	}
+	
+	/**
+	 * @see #putByte(byte)
+	 * @param number value to set
+	 * @return This buffer
+	 */
+	public BitBuffer put(byte number){
+		return putByte(number);
+	}
+	
+	/**
+	 * @see #putInt(int)
+	 * @param number value to set
+	 * @return This buffer
+	 */
+	public BitBuffer put(int number) {
+		return putInt(number);
+	}
+	
+	/**
+	 * @see #putLong(long)
+	 * @param number value to set
+	 * @return This buffer
+	 */
+	public BitBuffer put(long number) {
+		return putLong(number);
+	}
+	
+	/**
+	 * @see #putLong(long)
+	 * @param string value to set
+	 * @return This buffer
+	 */
+	public BitBuffer put(String string){
+		return putString(string);
+	}
+	
+	/**
 	 * @return Binary value of current bit
 	 */
 	public abstract boolean getBoolean();
@@ -169,6 +223,14 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * @return 64 bit long value
+	 */
+	public long getLong(){
+		return ((getByte()&0xFFL) << 56L) | ((getByte()&0xFFL) << 48L) | ((getByte()&0xFFL) << 40L) | ((getByte()&0xFFL) << 32L) 
+				| ((getByte()&0xFFL) << 24L) | ((getByte()&0xFFL) << 16L) | ((getByte()&0xFFL) << 8L) | (getByte()&0xFFL);
+	}
+	
+	/**
 	 * @param bits Length of integer
 	 * @return Integer value of given bit width
 	 */
@@ -188,10 +250,36 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * @param bits Length of long integer
+	 * @return Long value of given bit width
+	 */
+	public long getLong(int bits){
+		if(bits == 0)return 0;
+		long res = 0;
+		do {
+			if(bits > 31){
+				res = (long)(res << 8L) | (long)(getInt()&0xFFFFFFFFL);
+				bits -= 32;
+			}else{
+				res = (long)(res << bits) | (long)(getInt(bits)&0xFFFFFFFFL);
+				bits -= bits;
+			}
+		}while(bits > 0);
+		return res;
+	}
+	
+	/**
 	 * @return 32 bit floating point value
 	 */
 	public float getFloat(){
 		return Float.intBitsToFloat(getInt());
+	}
+	
+	/**
+	 * @return 64 bit floating point value
+	 */
+	public double getDouble(){
+		return Double.longBitsToDouble(getLong());
 	}
 	
 	/**
@@ -242,15 +330,22 @@ public abstract class BitBuffer {
 	 * @return This BitBuffer represented as byte array
 	 */
 	public byte[] asByteArray(){
-		if(!canRead())
-			throw new IllegalStateException("BitBuffer cannot be read");
-		byte[] result = new byte[limit()];
-		int startPos = position();
+		
+		byte[] result = new byte[(int) limit()];
+		long startPos = position();
+		boolean reflip = false;
+		if(!canRead()){
+			flip();
+			reflip = true;
+		}
 		setPosition(0);
-		for(int i = 0; i < limit(); ++i){
+		for(int i = 0; i*8 < limit(); ++i){
 			result[i] = getByte();
 		}
+		if(reflip)
+			flip();
 		setPosition(startPos);
+		
 		return result;
 	}
 	
@@ -277,139 +372,47 @@ public abstract class BitBuffer {
 	/**
 	 * @return Size of this buffer, in bits
 	 */
-	public abstract int size();
+	public abstract long size();
 	
 	/**
 	 * @return Virtual 'end' of this buffer, in bits
 	 */
-	public abstract int limit();
+	public abstract long limit();
 	
 	/**
 	 * @return Current position of cursor, in bits
 	 */
-	public abstract int position();
+	public abstract long position();
 	
 	/**
 	 * Sets cursor position for this buffer
+	 * @param newPosition position to set
 	 * @return This buffer
 	 */
-	public abstract BitBuffer setPosition(int newPosition);
+	public abstract BitBuffer setPosition(long newPosition);
 	
-	public static BitBuffer allocate(int bits){
-		return new SimpleBitBuffer(bits);
+	/**
+	 * Allocates new BitBuffer.
+	 * First bit is MSB of byte 0.
+	 * @param bits Amount of bits to allocate
+	 * @return Newly created instance of BitBuffer
+	 */
+	public static BitBuffer allocate(long bits){
+		return new ArrayBitBuffer(bits);
 	}
 	
-	protected static class SimpleBitBuffer extends BitBuffer{
-		private byte[] bytes;
-		private boolean read = false;
-		private int position;
-		private int limit;
-		
-		protected SimpleBitBuffer(int bits) {
-			bytes = new byte[bits/8];
-			limit = bits;
-		}
-		
-		protected SimpleBitBuffer(byte[] bytes) {
-			this.bytes = bytes;
-		}
-		
-		@Override
-		public BitBuffer putBoolean(boolean b) {
-			bytes[position/8] = (byte) ((bytes[position/8] & ~(0x80 >>> (position % 8))) + ((b?0x80:0) >>> (position % 8)) );
-			++position;
-			return this;
-		}
-
-		@Override
-		public BitBuffer putByte(byte b) {
-			byte old = (byte) (bytes[position/8] & (byte)~(0xFF >>> (position%8)));
-			bytes[position/8] = (byte) (old | (byte)((b&0xFF) >>> (position % 8)));
-			if(position % 8 > 0)
-				bytes[(position/8) + 1] = (byte) ((b&0xFF) << (8-(position % 8)));
-			position += 8;
-			return this;
-		}
-		
-		@Override
-		public BitBuffer putByte(byte b, int bits) {
-			b = (byte) (0xFF & ((b & (0xFF >>> (8 - bits))) << (8-bits)));
-			bytes[position/8] = (byte) (0xFF & ((bytes[position/8] & (0xFF << (8-position%8))) | ((b&0xFF) >>> (position%8)) ));
-			if(8-(position % 8) < bits)
-				bytes[(position/8) + 1] = (byte) (0xFF & ((b&0xFF) << (8-position % 8)));
-			position += bits;
-			return this;
-		}
-
-		@Override
-		public boolean getBoolean() {
-			boolean result = (bytes[position/8] & (0x80 >>> (position % 8))) > 0 ;
-			++position;
-			return result;
-		}
-
-		@Override
-		public byte getByte() {
-			byte b = (byte) ((bytes[position/8] & (0xFF >>> (position % 8))) << (position % 8));
-			b = position % 8 > 0 ? (byte) (b | (((0xFF & bytes[(position/8)+1]) >>> (8-(position % 8))))) : b;
-			position += 8;
-			return b;
-		}
-
-		@Override
-		public byte getByte(int bits) {
-			short mask = (short) (((0xFF00 << (8 - bits)) & 0xFFFF) >>> (position % 8));
-			
-			byte b = (byte) ((bytes[position/8] & ((mask & 0xFF00) >>> 8)) << (position % 8));
-			if(8-(position % 8) < bits)
-				b = (byte) (b | ((0xFF & (bytes[(position/8)+1] & (mask & 0x00FF))) >>> (bits - ((position % 8) + bits - 8))));
-
-			b = (byte) ((b&0xFF) >>> (8-bits));
-			position += bits;
-			return b;
-		}
-
-		@Override
-		public void flip() {
-			read = !read;
-			position = 0;
-		}
-
-		@Override
-		public boolean canRead() {
-			return read;
-		}
-
-		@Override
-		public boolean canWrite() {
-			return !read;
-		}
-
-		@Override
-		public int size() {
-			return bytes.length;
-		}
-
-		@Override
-		public int limit() {
-			return read ? limit : bytes.length;
-		}
-
-		@Override
-		public int position() {
-			return position;
-		}
-
-		@Override
-		public BitBuffer setPosition(int newPosition) {
-			position = newPosition;
-			return this;
-		}
-		
-		@Override
-		public byte[] asByteArray(){
-			return bytes;//FIXME: is this unsafe?
-		}
-		
+	public static BitBuffer allocateDirect(long bits){
+		return new DirectBitBuffer(bits);
 	}
+	
+	/**
+	 * Wraps bitbuffer around given array instance.
+	 * Any operation on this bitBuffer will modify the array
+	 * @param array A byte array to wrap this buffer around
+	 * @return Newly created instance of BitBuffer wrapped around array
+	 */
+	public static BitBuffer wrap(byte[] array){
+		return new ArrayBitBuffer(array);
+	}
+
 }

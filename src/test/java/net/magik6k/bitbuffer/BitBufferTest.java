@@ -1,6 +1,9 @@
 package net.magik6k.bitbuffer;
 
 import static org.junit.Assert.*;
+
+import java.nio.BufferOverflowException;
+
 import net.magik6k.bitbuffer.BitBuffer;
 
 import org.junit.BeforeClass;
@@ -10,6 +13,69 @@ public class BitBufferTest {
 	@BeforeClass
 	public static void prepare() {
 		
+	}
+	
+	@Test(expected=BufferOverflowException.class)
+	public void directOverflowTest(){
+		BitBuffer buffer = BitBuffer.allocateDirect(48);
+		buffer.putInt(9543145);
+		buffer.putInt(631467833);
+	}
+	
+	@Test
+	public void basicDirectTest(){
+		BitBuffer buffer = BitBuffer.allocateDirect(128);
+		
+		buffer.put(true);
+		buffer.put(13491367912857698L);
+		buffer.put(197465);
+		
+		buffer.flip();
+		
+		assertEquals(true, buffer.getBoolean());
+		assertHex(13491367912857698L, buffer.getLong());
+		assertHex(197465, buffer.getInt());
+	}
+	
+	@Test
+	public void doubleTest(){
+		BitBuffer buffer = BitBuffer.allocate(128);
+		
+		buffer.putDouble(1234567890.12345);
+		buffer.putDouble(4572145.34653625);
+		
+		buffer.flip();
+		
+		assertEquals(1234567890.12345, buffer.getDouble());
+		assertEquals(4572145.34653625, buffer.getDouble());
+	}
+	
+	@Test
+	public void partialLongTest(){
+		BitBuffer buffer = BitBuffer.allocate(128);
+		
+		buffer.putLong(29, 10);
+		buffer.putLong(2L^33L+5154516L, 40);
+		buffer.putLong(Long.MAX_VALUE-Long.MAX_VALUE/2-5, 63);
+		
+		buffer.flip();
+		
+		assertHex(29, buffer.getLong(10));
+		assertHex(2L^33L+5154516L, buffer.getLong(40));
+		assertHex(Long.MAX_VALUE-Long.MAX_VALUE/2-5, buffer.getLong(63));
+	}
+	
+	@Test
+	public void longTest(){
+		BitBuffer buffer = BitBuffer.allocate(128);
+		
+		buffer.putLong(0xAD3958BAFD2C9E0AL);
+		buffer.putLong(0x3BEEF14DEAD00BADL);
+		
+		buffer.flip();
+		
+		assertHex(0xAD3958BAFD2C9E0AL, buffer.getLong());
+		assertHex(0x3BEEF14DEAD00BADL, buffer.getLong());
 	}
 	
 	@Test
@@ -27,12 +93,12 @@ public class BitBufferTest {
 	@Test
 	public void partialStringTest(){
 		BitBuffer buffer = BitBuffer.allocate(8*16);
-		buffer.putString("12 3!!", 6);
+		buffer.putString("12 3!", 6);
 		buffer.putString("ItWorks!", 7);
 		
 		buffer.flip();
 		
-		assertEquals("12 3!!", buffer.getString(6, 6));
+		assertEquals("12 3!", buffer.getString(5, 6));
 		assertEquals("ItWorks!", buffer.getString(8, 7));
 	}
 	
@@ -136,10 +202,10 @@ public class BitBufferTest {
 		buffer.putBoolean(false);
 		buffer.putBoolean(true);
 		buffer.putBoolean(true);
-		assertEquals(14, buffer.position());
+		assertEquals(14L, buffer.position());
 		assertBits((byte)0x4C, buffer.asByteArray()[1]);
 		buffer.putByte((byte) 0xDC); //1101 1100(pos: 1,6 - 2,6)
-		assertEquals(14+8, buffer.position());
+		assertEquals(14L+8L, buffer.position());
 		buffer.putBoolean(false);
 		buffer.putBoolean(false);
 		buffer.putByte((byte) 0x0D);
@@ -290,6 +356,12 @@ public class BitBufferTest {
 		assertTrue(buffer.getBoolean());
 		assertTrue(buffer.getBoolean());
 		assertTrue(buffer.getBoolean());
+	}
+	
+	public static void assertHex(long expected, long actual){
+		if(expected != actual)
+			throw new AssertionError("expected:<"+"0x" + Long.toHexString(expected)
+					+"> but was:<"+"0x" + Long.toHexString(actual) +">");
 	}
 	
 	public static void assertHex(int expected, int actual){
