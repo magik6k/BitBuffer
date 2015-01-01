@@ -3,6 +3,7 @@ package net.magik6k.bitbuffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+
 public abstract class BitBuffer {
 	/**
 	 * Puts boolean value(Single bit)
