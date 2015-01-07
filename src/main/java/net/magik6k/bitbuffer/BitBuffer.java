@@ -200,6 +200,34 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * Reads entire given BitBuffer into this buffer
+	 * @param buffer Readable buffer
+	 * @return This buffer
+	 */
+	public BitBuffer put(BitBuffer buffer){
+		while(buffer.limit() - buffer.position() > 0){
+			if(buffer.limit() - buffer.position() < 8){
+				this.put(buffer.getBoolean());
+			}else{
+				this.put(buffer.getByte());
+			}
+		}
+		return this;
+	}
+	
+	/**
+	 * Reads entire given {@link ByteBuffer} into this buffer
+	 * @param buffer Readable buffer
+	 * @return This buffer
+	 */
+	public BitBuffer put(ByteBuffer buffer){
+		while(buffer.remaining() > 1){
+			this.put(buffer.get());
+		}
+		return this;
+	}
+	
+	/**
 	 * @return Binary value of current bit
 	 */
 	public abstract boolean getBoolean();
@@ -370,16 +398,19 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * This function returns size of this buffer, in bits
 	 * @return Size of this buffer, in bits
 	 */
 	public abstract long size();
 	
 	/**
+	 * This function returns Virtual 'end' of this buffer, in bits
 	 * @return Virtual 'end' of this buffer, in bits
 	 */
 	public abstract long limit();
 	
 	/**
+	 * This function returns current position of cursor, in bits
 	 * @return Current position of cursor, in bits
 	 */
 	public abstract long position();
