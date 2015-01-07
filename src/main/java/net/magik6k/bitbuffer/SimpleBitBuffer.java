@@ -67,6 +67,8 @@ abstract class SimpleBitBuffer extends BitBuffer{
 	@Override
 	public void flip() {
 		read = !read;
+		if(read)
+			limit = position;
 		position = 0;
 	}
 
