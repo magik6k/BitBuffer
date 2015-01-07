@@ -447,8 +447,33 @@ public abstract class BitBuffer {
 		return new ArrayBitBuffer(bits);
 	}
 	
+	/**
+	 * Allocates new 'direct' BitBuffer. This buffer is allocated using off-heap, native memory.
+	 * This solution MAY be faster, however you may notice way slower allocation. 
+	 * @param bits Amount of bits to allocate
+	 * @return Newly created instance of BitBuffer
+	 */
 	public static BitBuffer allocateDirect(long bits){
 		return new DirectBitBuffer(bits);
+	}
+	
+	/**
+	 * Creates new auto-extending BitBuffer.
+	 * Limit of this buffer in write mode has no real meaning.
+	 * @return Newly created instance of BitBuffer
+	 */
+	public static BitBuffer allocateDynamic(){
+		return new AutomaticBitBuffer();
+	}
+	
+	/**
+	 * Creates new auto-extending BitBuffer with pre-allocated space.
+	 * Limit of this buffer in write mode has no real meaning.
+	 * @param preallocateBits Amount of space to pre-allocate, in bits
+	 * @return Newly created instance of BitBuffer
+	 */
+	public static BitBuffer allocateDynamic(int preallocateBits){
+		return new AutomaticBitBuffer(preallocateBits);
 	}
 	
 	/**

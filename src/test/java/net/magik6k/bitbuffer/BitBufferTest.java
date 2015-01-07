@@ -15,6 +15,21 @@ public class BitBufferTest {
 		
 	}
 	
+	@Test
+	public void dynamicBufferTest(){
+		BitBuffer buffer = BitBuffer.allocateDynamic();
+		
+		buffer.put(433262345654642562L);
+		buffer.put(false);
+		buffer.putString("HELLO", 7);
+		
+		buffer.flip();
+		
+		assertEquals(433262345654642562L, buffer.getLong());
+		assertEquals(false, buffer.getBoolean());
+		assertEquals("HELLO", buffer.getString(5, 7));
+	}
+	
 	@Test(expected=BufferOverflowException.class)
 	public void directOverflowTest(){
 		BitBuffer buffer = BitBuffer.allocateDirect(48);
