@@ -3,7 +3,12 @@ package net.magik6k.bitbuffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-
+/**
+ * The BitBuffer, useful to store data in bit-aligned format
+ * All multi-byte data structures are saved in Java byte order i.e. big endian
+ * @see #allocate(long)
+ * @see #allocateDirect(long)
+ */
 public abstract class BitBuffer {
 	/**
 	 * Puts boolean value(Single bit)
@@ -224,6 +229,16 @@ public abstract class BitBuffer {
 		while(buffer.remaining() > 1){
 			this.put(buffer.get());
 		}
+		return this;
+	}
+	
+	/**
+	 * Insters given data into buffer
+	 * @param data Instance of class implementing {@link IBufferInsert}
+	 * @return This buffer
+	 */
+	public BitBuffer put(IBufferInsert data){
+		data.instert(this);
 		return this;
 	}
 	
