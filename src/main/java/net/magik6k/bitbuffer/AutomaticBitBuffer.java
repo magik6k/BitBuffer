@@ -3,41 +3,51 @@ package net.magik6k.bitbuffer;
 import java.util.ArrayList;
 
 class AutomaticBitBuffer extends SimpleBitBuffer{
-	private ArrayList<Byte> bytes;//TODO: use some better method
+	private static final int DEFAULT_CAPACITY = 128;
+	
+	
+	private byte[] bytes;
+	
+	
 	
 	protected AutomaticBitBuffer() {
-		bytes = new ArrayList<Byte>();
+		bytes = new byte[DEFAULT_CAPACITY];
 	}
 	
 	protected AutomaticBitBuffer(long initialCapacity){
-		bytes = new ArrayList<Byte>((int) ((initialCapacity+(8-initialCapacity%8))/8));
-		while(initialCapacity > bytes.size())
-			bytes.add((byte) 0);
+		bytes = new byte[(int)toBytes(initialCapacity)];
 	}
+	
+	private static long toBytes(long bits){
+		return (bits+(8-bits%8))/8;
+	}
+	
 	
 	@Override
 	protected byte rawGet(long index) {
-		if(index >= bytes.size()){
-			bytes.ensureCapacity((int) index+1);
-			while(index >= bytes.size())
-				bytes.add((byte) 0);
+		if(index >= bytes.length){
+			ensureCapacity((int)index+1);
 		}
-		return bytes.get((int) index);
+		return bytes[(int)index];
+	}
+	
+	private void ensureCapacity(int toBytes){
+		byte[] newBytes = new byte[toBytes];
+		System.arraycopy(bytes,0,newBytes,0,bytes.length);
+		bytes = newBytes;
 	}
 
 	@Override
 	protected void rawSet(long index, byte value) {
-		if(index >= bytes.size()){
-			bytes.ensureCapacity((int) index+1);
-			while(index >= bytes.size())
-				bytes.add((byte) 0);
+		if(index >= bytes.length){
+			ensureCapacity((int)index+1);
 		}
-		bytes.set((int) index, value);
+		bytes[(int)index] = value;
 	}
 
 	@Override
 	protected long rawLength() {
-		return bytes.size()*8;
+		return bytes.length*8;
 	}
 	
 }
