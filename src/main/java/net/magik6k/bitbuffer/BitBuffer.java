@@ -1,6 +1,7 @@
 package net.magik6k.bitbuffer;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -135,7 +136,7 @@ public abstract class BitBuffer {
 	}
 	
 	/**
-	 * Puts {@link String} value(8 bits per char), using UTF-8
+	 * Puts {@link String} value(8 bits per char), using UTF-8 encoding
 	 * @param s value to set
 	 * @return This buffer
 	 */
@@ -147,13 +148,41 @@ public abstract class BitBuffer {
 	}
 	
 	/**
-	 * Puts {@link String} value(specified amount bits per char), using UTF-8
+	 * Puts {@link String} value
+	 * @param s value to set
+	 * @param charset {@link Charset} to use
+	 * @return This buffer
+	 */
+	public BitBuffer putString(String s, Charset charset){
+		for(byte ch : s.getBytes(charset)){
+			putByte(ch);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts {@link String} value(specified amount bits per char), using ASCII encoding
 	 * @param s value to set
 	 * @param bitsPerChar amount of bits to use per character
 	 * @return This buffer
 	 */
 	public BitBuffer putString(String s, int bitsPerChar){
-		for(byte ch : s.getBytes(StandardCharsets.UTF_8)){
+		for(byte ch : s.getBytes(StandardCharsets.US_ASCII)){
+			putByte(ch, bitsPerChar);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts {@link String} value(specified amount of bits per byte), using specified encoding
+	 * @param s value to set
+	 * @param charset {@link Charset} to use
+	 * @param bitsPerChar amount of bits to use per character
+	 * @return This buffer
+	 * @note Use this method with care
+	 */
+	public BitBuffer putString(String s, Charset charset, int bitsPerChar){
+		for(byte ch : s.getBytes(charset)){
 			putByte(ch, bitsPerChar);
 		}
 		return this;
@@ -327,7 +356,7 @@ public abstract class BitBuffer {
 	
 	/**
 	 * @param length Length of the string
-	 * @return String of given length, with 8-bit wide characters
+	 * @return String of given length, with 8-bit wide characters, using UTF-8 encoding
 	 */
 	public String getString(int length){
 		byte[] bytes = new byte[length];
@@ -339,15 +368,42 @@ public abstract class BitBuffer {
 	
 	/**
 	 * @param length Length of the string
+	 * @param charset {@link Charset} to use for decoding
+	 * @return String of given length, with 8-bit wide characters, using UTF-8 encoding
+	 */
+	public String getString(int length, Charset charset){
+		byte[] bytes = new byte[length];
+		for(int i = 0; i < length; ++i){
+			bytes[i] = getByte();
+		}
+		return new String(bytes, charset);
+	}
+	
+	/**
+	 * @param length Length of the string
 	 * @param bitsPerChar amount of bits used per char
-	 * @return String of given length
+	 * @return String of given length, using ASCII encoding
 	 */
 	public String getString(int length, int bitsPerChar){
 		byte[] bytes = new byte[length];
 		for(int i = 0; i < length; ++i){
 			bytes[i] = getByte(bitsPerChar);
 		}
-		return new String(bytes, StandardCharsets.UTF_8);
+		return new String(bytes, StandardCharsets.US_ASCII);
+	}
+	
+	/**
+	 * @param length Length of the string
+	 * @param charset {@link Charset} to use for decoding
+	 * @param bitsPerChar amount of bits used per char
+	 * @return String of given length, using ASCII encoding
+	 */
+	public String getString(int length, Charset charset, int bitsPerChar){
+		byte[] bytes = new byte[length];
+		for(int i = 0; i < length; ++i){
+			bytes[i] = getByte(bitsPerChar);
+		}
+		return new String(bytes, charset);
 	}
 	
 	/**
