@@ -174,12 +174,11 @@ public abstract class BitBuffer {
 	}
 	
 	/**
-	 * Puts {@link String} value(specified amount of bits per byte), using specified encoding
+	 * Puts {@link String} value(specified amount of bits per byte), using specified encoding. Use this method with care!
 	 * @param s value to set
 	 * @param charset {@link Charset} to use
 	 * @param bitsPerChar amount of bits to use per character
 	 * @return This buffer
-	 * @note Use this method with care
 	 */
 	public BitBuffer putString(String s, Charset charset, int bitsPerChar){
 		for(byte ch : s.getBytes(charset)){
@@ -460,6 +459,7 @@ public abstract class BitBuffer {
 	/**
 	 * Toggles the buffer betwen read/write modes. 
 	 * Limit is set at current position, and cursor is set at position 0
+	 * @return This BitBuffer
 	 */
 	public abstract BitBuffer flip();
 	
