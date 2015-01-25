@@ -28,7 +28,7 @@ public abstract class BitBuffer {
 	}
 	
 	/**
-	 * Puts byte value(8 bits)
+	 * Puts signed byte value(8 bits)
 	 * @param b value to set
 	 * @return This buffer
 	 */
@@ -36,7 +36,7 @@ public abstract class BitBuffer {
 	
 	/**
 	 * Puts byte value with specified bit count. Note that this
-	 * method can only be used with only positive numbers or zero.
+	 * method can be used with both signed and unsigned data.
 	 * @param b value to set
 	 * @param bits Number of bits to use
 	 * @return This buffer
@@ -44,7 +44,7 @@ public abstract class BitBuffer {
 	public abstract BitBuffer putByte(byte b, int bits);
 	
 	/**
-	 * Puts integer value(32 bits)
+	 * Puts signed integer value(32 bits)
 	 * @param i value to set
 	 * @return This buffer
 	 */
@@ -57,7 +57,7 @@ public abstract class BitBuffer {
 	}
 	
 	/**
-	 * Puts long value(64 bits)
+	 * Puts signed long value(64 bits)
 	 * @param l value to set
 	 * @return This buffer
 	 */
@@ -75,7 +75,7 @@ public abstract class BitBuffer {
 	
 	/**
 	 * Puts integer value with specified bit count. Note that this
-	 * method can only be used only with positive numbers or zero.
+	 * method can be used with both signed and unsigned data.
 	 * @param i value to set
 	 * @param bits Number of bits to use
 	 * @return This buffer
@@ -96,7 +96,7 @@ public abstract class BitBuffer {
 	
 	/**
 	 * Puts long value with specified bit count. Note that this
-	 * method can only be used only with positive numbers or zero.
+	 * method can be used with both signed and unsigned data.
 	 * @param l value to set
 	 * @param bits Number of bits to use
 	 * @return This buffer
@@ -277,25 +277,25 @@ public abstract class BitBuffer {
 	public abstract boolean getBoolean();
 	
 	/**
-	 * @return 8 bit byte value
+	 * @return 8 bit signed byte value
 	 */
 	public abstract byte getByte();
 	
 	/**
 	 * @param bits length of value in bits
-	 * @return Byte value of given bit width
+	 * @return Unsigned Byte value of given bit width
 	 */
-	public abstract byte getByte(int bits);
+	public abstract byte getByteUnsigned(int bits);
 	
 	/**
-	 * @return 32 bit integer value
+	 * @return 32 bit signed integer value
 	 */
 	public int getInt(){
 		return ((getByte()&0xFF) << 24) | ((getByte()&0xFF) << 16) | ((getByte()&0xFF) << 8) | (getByte()&0xFF);
 	}
 	
 	/**
-	 * @return 64 bit long value
+	 * @return 64 bit signed long value
 	 */
 	public long getLong(){
 		return ((getByte()&0xFFL) << 56L) | ((getByte()&0xFFL) << 48L) | ((getByte()&0xFFL) << 40L) | ((getByte()&0xFFL) << 32L) 
@@ -306,7 +306,7 @@ public abstract class BitBuffer {
 	 * @param bits Length of integer
 	 * @return Integer value of given bit width
 	 */
-	public int getInt(int bits){
+	public int getIntUnsigned(int bits){
 		if(bits == 0)return 0;
 		int res = 0;
 		do {
@@ -314,7 +314,7 @@ public abstract class BitBuffer {
 				res = (res << 8) | (getByte()&0xFF);
 				bits -= 8;
 			}else{
-				res = (res << bits) + (getByte(bits)&0xFF);
+				res = (res << bits) + (getByteUnsigned(bits)&0xFF);
 				bits -= bits;
 			}
 		}while(bits > 0);
@@ -325,7 +325,7 @@ public abstract class BitBuffer {
 	 * @param bits Length of long integer
 	 * @return Long value of given bit width
 	 */
-	public long getLong(int bits){
+	public long getLongUnsigned(int bits){
 		if(bits == 0)return 0;
 		long res = 0;
 		do {
@@ -333,7 +333,7 @@ public abstract class BitBuffer {
 				res = (long)(res << 32L) | (long)(getInt()&0xFFFFFFFFL);
 				bits -= 32;
 			}else{
-				res = (long)(res << bits) | (long)(getInt(bits)&0xFFFFFFFFL);
+				res = (long)(res << bits) | (long)(getIntUnsigned(bits)&0xFFFFFFFFL);
 				bits -= bits;
 			}
 		}while(bits > 0);
@@ -387,7 +387,7 @@ public abstract class BitBuffer {
 	public String getString(int length, int bitsPerChar){
 		byte[] bytes = new byte[length];
 		for(int i = 0; i < length; ++i){
-			bytes[i] = getByte(bitsPerChar);
+			bytes[i] = getByteUnsigned(bitsPerChar);
 		}
 		return new String(bytes, StandardCharsets.US_ASCII);
 	}
@@ -401,7 +401,7 @@ public abstract class BitBuffer {
 	public String getString(int length, Charset charset, int bitsPerChar){
 		byte[] bytes = new byte[length];
 		for(int i = 0; i < length; ++i){
-			bytes[i] = getByte(bitsPerChar);
+			bytes[i] = getByteUnsigned(bitsPerChar);
 		}
 		return new String(bytes, charset);
 	}

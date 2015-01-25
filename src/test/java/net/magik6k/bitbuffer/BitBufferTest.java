@@ -76,10 +76,10 @@ public class BitBufferTest {
 		
 		buffer.flip();
 		
-		assertHex(29, buffer.getLong(10));
-		assertHex(2L^33L+5154516L, buffer.getLong(40));
-		assertHex(Long.MAX_VALUE-Long.MAX_VALUE/2-5, buffer.getLong(63));
-		assertHex(7345626362363462346L, buffer.getLong(64));
+		assertHex(29, buffer.getLongUnsigned(10));
+		assertHex(2L^33L+5154516L, buffer.getLongUnsigned(40));
+		assertHex(Long.MAX_VALUE-Long.MAX_VALUE/2-5, buffer.getLongUnsigned(63));
+		assertHex(7345626362363462346L, buffer.getLongUnsigned(64));
 	}
 	
 	@Test
@@ -145,9 +145,9 @@ public class BitBufferTest {
 		
 		buffer.flip();
 		
-		assertHex(0xBADC0DE, buffer.getInt(28));
-		assertHex(0xDEAD, buffer.getInt(16));
-		assertHex(0xBEEF, buffer.getInt(16));
+		assertHex(0xBADC0DE, buffer.getIntUnsigned(28));
+		assertHex(0xDEAD, buffer.getIntUnsigned(16));
+		assertHex(0xBEEF, buffer.getIntUnsigned(16));
 	}
 	
 	@Test
@@ -174,7 +174,7 @@ public class BitBufferTest {
 		buffer.flip();
 		
 		assertBits((byte) 0x7F, buffer.getByte());
-		assertBits((byte) 0xA2, buffer.getByte(8));
+		assertBits((byte) 0xA2, buffer.getByteUnsigned(8));
 	}
 	
 	@Test
@@ -190,10 +190,10 @@ public class BitBufferTest {
 		
 		buffer.flip();
 		
-		assertBits((byte) 0x7, buffer.getByte(3));
-		assertBits((byte) 0xD, buffer.getByte(4));
-		assertBits((byte) 0x2A, buffer.getByte(6));
-		assertBits((byte) 0x5, buffer.getByte(3));
+		assertBits((byte) 0x7, buffer.getByteUnsigned(3));
+		assertBits((byte) 0xD, buffer.getByteUnsigned(4));
+		assertBits((byte) 0x2A, buffer.getByteUnsigned(6));
+		assertBits((byte) 0x5, buffer.getByteUnsigned(3));
 		
 		buffer.flip();
 		
@@ -203,9 +203,9 @@ public class BitBufferTest {
 		
 		buffer.flip();
 		
-		assertBits((byte) 0x5D, buffer.getByte(7));
-		assertBits((byte) 0x2, buffer.getByte(3));
-		assertBits((byte) 0x31, buffer.getByte(6));
+		assertBits((byte) 0x5D, buffer.getByteUnsigned(7));
+		assertBits((byte) 0x2, buffer.getByteUnsigned(3));
+		assertBits((byte) 0x31, buffer.getByteUnsigned(6));
 	}
 	
 	@Test
