@@ -66,7 +66,7 @@ abstract class SimpleBitBuffer extends BitBuffer{
 		b = (byte) ((b&0xFF) >>> (8-bits));
 		position += bits;
 		
-		return (byte) (sign ? (0xFF << bits) | b : b);
+		return (byte) (sign ? ((0xFF << bits)&0xFF) | b : b);
 	}
 	
 	@Override

@@ -301,16 +301,31 @@ public abstract class BitBuffer {
 	}
 	
 	/**
-	 * @return 64 bit signed long value
+	 * @param bits Length of integer
+	 * @return Signed integer value of given bit width
 	 */
-	public long getLong(){
-		return ((getByte()&0xFFL) << 56L) | ((getByte()&0xFFL) << 48L) | ((getByte()&0xFFL) << 40L) | ((getByte()&0xFFL) << 32L) 
-				| ((getByte()&0xFFL) << 24L) | ((getByte()&0xFFL) << 16L) | ((getByte()&0xFFL) << 8L) | (getByte()&0xFFL);
+	public int getInt(int bits){
+		if(bits == 0)return 0;
+		boolean sign = getBoolean();
+		int inBits = --bits;
+		
+		int res = 0;
+		do {
+			if(bits > 7){
+				res = (res << 8) | (getByte()&0xFF);
+				bits -= 8;
+			}else{
+				res = (res << bits) + (getByteUnsigned(bits)&0xFF);
+				bits -= bits;
+			}
+		}while(bits > 0);
+		
+		return (int) (sign ? (0xFFFFFFFF << inBits) | res : res);
 	}
 	
 	/**
 	 * @param bits Length of integer
-	 * @return Integer value of given bit width
+	 * @return Unsigned Integer value of given bit width
 	 */
 	public int getIntUnsigned(int bits){
 		if(bits == 0)return 0;
@@ -328,8 +343,38 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * @return 64 bit signed long value
+	 */
+	public long getLong(){
+		return ((getByte()&0xFFL) << 56L) | ((getByte()&0xFFL) << 48L) | ((getByte()&0xFFL) << 40L) | ((getByte()&0xFFL) << 32L) 
+				| ((getByte()&0xFFL) << 24L) | ((getByte()&0xFFL) << 16L) | ((getByte()&0xFFL) << 8L) | (getByte()&0xFFL);
+	}
+	
+	/**
 	 * @param bits Length of long integer
-	 * @return Long value of given bit width
+	 * @return Signed long value of given bit width
+	 */
+	public long getLong(int bits){
+		if(bits == 0)return 0;
+		boolean sign = getBoolean();
+		int inBits = --bits;
+		
+		long res = 0;
+		do {
+			if(bits > 31){
+				res = (long)(res << 32L) | (long)(getInt()&0xFFFFFFFFL);
+				bits -= 32;
+			}else{
+				res = (long)(res << bits) | (long)(getIntUnsigned(bits)&0xFFFFFFFFL);
+				bits -= bits;
+			}
+		}while(bits > 0);
+		return (sign ? (0xFFFFFFFFFFFFFFFFL << (long) inBits) | res : res);
+	}
+	
+	/**
+	 * @param bits Length of long integer
+	 * @return Unsigned long value of given bit width
 	 */
 	public long getLongUnsigned(int bits){
 		if(bits == 0)return 0;

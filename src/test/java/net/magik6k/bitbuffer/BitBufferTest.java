@@ -80,6 +80,21 @@ public class BitBufferTest {
 		assertHex(2L^33L+5154516L, buffer.getLongUnsigned(40));
 		assertHex(Long.MAX_VALUE-Long.MAX_VALUE/2-5, buffer.getLongUnsigned(63));
 		assertHex(7345626362363462346L, buffer.getLongUnsigned(64));
+		
+		buffer.flip();
+		
+		buffer.putLong(-506, 10);
+		buffer.putLong(75745237252L, 40);
+		buffer.putLong(-4537245723L, 63);
+		buffer.putLong(-3462536625742L, 64);
+		
+		buffer.flip();
+		
+		assertHex(-506, buffer.getLong(10));
+		assertHex(75745237252L, buffer.getLong(40));
+		assertHex(-4537245723L, buffer.getLong(63));
+		assertHex(-3462536625742L, buffer.getLong(64));
+		
 	}
 	
 	@Test
@@ -148,6 +163,18 @@ public class BitBufferTest {
 		assertHex(0xBADC0DE, buffer.getIntUnsigned(28));
 		assertHex(0xDEAD, buffer.getIntUnsigned(16));
 		assertHex(0xBEEF, buffer.getIntUnsigned(16));
+		
+		buffer.flip();
+		
+		buffer.putInt(-1342366, 28);
+		buffer.putInt(-3245, 16);
+		buffer.putInt(3456, 16);
+		
+		buffer.flip();
+		
+		assertHex(-1342366, buffer.getInt(28));
+		assertHex(-3245, buffer.getInt(16));
+		assertHex(3456, buffer.getInt(16));
 	}
 	
 	@Test
