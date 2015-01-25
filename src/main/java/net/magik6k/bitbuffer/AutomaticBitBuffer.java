@@ -1,14 +1,10 @@
 package net.magik6k.bitbuffer;
 
-import java.util.ArrayList;
 
 class AutomaticBitBuffer extends SimpleBitBuffer{
 	private static final int DEFAULT_CAPACITY = 128;
 	
-	
 	private byte[] bytes;
-	
-	
 	
 	protected AutomaticBitBuffer() {
 		bytes = new byte[DEFAULT_CAPACITY];

@@ -354,7 +354,7 @@ public abstract class BitBuffer {
 	 * Toggles the buffer betwen read/write modes. 
 	 * Limit is set at current position, and cursor is set at position 0
 	 */
-	public abstract void flip();
+	public abstract BitBuffer flip();
 	
 	/**
 	 * @return Boolean value telling if the buffer can output data
