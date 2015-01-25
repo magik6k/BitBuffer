@@ -1,7 +1,7 @@
 package net.magik6k.bitbuffer;
 
 /**
- * Classes implementing this interface can be directly inserted into {@link BitBuffer} via its {@link BitBuffer#put(IBufferPuttable) put} method
+ * Classes implementing this interface can be directly inserted into {@link BitBuffer} via its {@link BitBuffer#put(IBufferInsert) put} method
  */
 public interface IBufferInsert {
 	/**

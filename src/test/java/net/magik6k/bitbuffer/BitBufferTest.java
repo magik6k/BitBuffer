@@ -67,17 +67,19 @@ public class BitBufferTest {
 	
 	@Test
 	public void partialLongTest(){
-		BitBuffer buffer = BitBuffer.allocate(128);
+		BitBuffer buffer = BitBuffer.allocate(192);
 		
 		buffer.putLong(29, 10);
 		buffer.putLong(2L^33L+5154516L, 40);
 		buffer.putLong(Long.MAX_VALUE-Long.MAX_VALUE/2-5, 63);
+		buffer.putLong(7345626362363462346L, 64);
 		
 		buffer.flip();
 		
 		assertHex(29, buffer.getLong(10));
 		assertHex(2L^33L+5154516L, buffer.getLong(40));
 		assertHex(Long.MAX_VALUE-Long.MAX_VALUE/2-5, buffer.getLong(63));
+		assertHex(7345626362363462346L, buffer.getLong(64));
 	}
 	
 	@Test

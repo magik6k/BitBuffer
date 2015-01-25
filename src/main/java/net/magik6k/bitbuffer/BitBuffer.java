@@ -301,7 +301,7 @@ public abstract class BitBuffer {
 		long res = 0;
 		do {
 			if(bits > 31){
-				res = (long)(res << 8L) | (long)(getInt()&0xFFFFFFFFL);
+				res = (long)(res << 32L) | (long)(getInt()&0xFFFFFFFFL);
 				bits -= 32;
 			}else{
 				res = (long)(res << bits) | (long)(getInt(bits)&0xFFFFFFFFL);
