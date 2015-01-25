@@ -206,6 +206,18 @@ public class BitBufferTest {
 		assertBits((byte) 0x5D, buffer.getByteUnsigned(7));
 		assertBits((byte) 0x2, buffer.getByteUnsigned(3));
 		assertBits((byte) 0x31, buffer.getByteUnsigned(6));
+		
+		buffer.flip();
+		
+		buffer.putByte((byte) -60, 7);
+		buffer.putByte((byte) 3, 3);
+		buffer.putByte((byte) -19, 6);
+		
+		buffer.flip();
+		
+		assertBits((byte) -60, buffer.getByte(7));
+		assertBits((byte) 3, buffer.getByte(3));
+		assertBits((byte) -19, buffer.getByte(6));
 	}
 	
 	@Test

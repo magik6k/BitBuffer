@@ -283,6 +283,12 @@ public abstract class BitBuffer {
 	
 	/**
 	 * @param bits length of value in bits
+	 * @return Signed Byte value of given bit width
+	 */
+	public abstract byte getByte(int bits);
+	
+	/**
+	 * @param bits length of value in bits
 	 * @return Unsigned Byte value of given bit width
 	 */
 	public abstract byte getByteUnsigned(int bits);

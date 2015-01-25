@@ -52,6 +52,24 @@ abstract class SimpleBitBuffer extends BitBuffer{
 	}
 
 	@Override
+	public byte getByte(int bits) {
+		boolean sign = (rawGet(position/8) & (0x80 >>> (position % 8))) > 0;
+		position++;
+		bits--;
+		
+		short mask = (short) (((0xFF00 << (8 - bits)) & 0xFFFF) >>> (position % 8));
+		
+		byte b = (byte) ((rawGet(position/8) & ((mask & 0xFF00) >>> 8)) << (position % 8));
+		if(8-(position % 8) < bits)
+			b = (byte) (b | ((0xFF & (rawGet((position/8)+1) & (mask & 0x00FF))) >>> (bits - ((position % 8) + bits - 8))));
+
+		b = (byte) ((b&0xFF) >>> (8-bits));
+		position += bits;
+		
+		return (byte) (sign ? (0xFF << bits) | b : b);
+	}
+	
+	@Override
 	public byte getByteUnsigned(int bits) {
 		short mask = (short) (((0xFF00 << (8 - bits)) & 0xFFFF) >>> (position % 8));
 		
