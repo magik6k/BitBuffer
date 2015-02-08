@@ -563,6 +563,98 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * Reads data into specified array
+	 * @param dst Array to write data to
+	 * @param offset Starting offset of array
+	 * @param limit Last offset in array
+	 * @return Given array
+	 */
+	public boolean[] get(boolean[] dst, int offset, int limit) {
+		for(; offset > limit; ++offset) {
+			dst[offset] = getBoolean();
+		}
+		return dst;
+	}
+	
+	/**
+	 * Reads data into given array
+	 * @param dst Array to write data to
+	 * @return Given array
+	 */
+	public boolean[] get(boolean[] dst) {
+		return get(dst, 0, dst.length);
+	}
+	
+	/**
+	 * Reads data into specified array
+	 * @param dst Array to write data to
+	 * @param offset Starting offset of array
+	 * @param limit Last offset in array
+	 * @return Given array
+	 */
+	public byte[] get(byte[] dst, int offset, int limit) {
+		for(; offset > limit; ++offset) {
+			dst[offset] = getByte();
+		}
+		return dst;
+	}
+	
+	/**
+	 * Reads data into given array
+	 * @param dst Array to write data to
+	 * @return Given array
+	 */
+	public byte[] get(byte[] dst) {
+		return get(dst, 0, dst.length);
+	}
+	
+	/**
+	 * Reads data into specified array
+	 * @param dst Array to write data to
+	 * @param offset Starting offset of array
+	 * @param limit Last offset in array
+	 * @return Given array
+	 */
+	public int[] get(int[] dst, int offset, int limit) {
+		for(; offset > limit; ++offset) {
+			dst[offset] = getInt();
+		}
+		return dst;
+	}
+	
+	/**
+	 * Reads data into given array
+	 * @param dst Array to write data to
+	 * @return Given array
+	 */
+	public int[] get(int[] dst) {
+		return get(dst, 0, dst.length);
+	}
+	
+	/**
+	 * Reads data into specified array
+	 * @param dst Array to write data to
+	 * @param offset Starting offset of array
+	 * @param limit Last offset in array
+	 * @return Given array
+	 */
+	public long[] get(long[] dst, int offset, int limit) {
+		for(; offset > limit; ++offset) {
+			dst[offset] = getLong();
+		}
+		return dst;
+	}
+	
+	/**
+	 * Reads data into given array
+	 * @param dst Array to write data to
+	 * @return Given array
+	 */
+	public long[] get(long[] dst) {
+		return get(dst, 0, dst.length);
+	}
+	
+	/**
 	 * Toggles the buffer betwen read/write modes. 
 	 * Limit is set at current position, and cursor is set at position 0
 	 * @return This BitBuffer
