@@ -224,6 +224,36 @@ public abstract class BitBuffer {
 	}
 	
 	/**
+	 * @see #putByte(byte)
+	 * @param number value to set
+	 * @param bits Bits to use
+	 * @return This buffer
+	 */
+	public BitBuffer put(byte number, int bits){
+		return putByte(number, bits);
+	}
+	
+	/**
+	 * @see #putInt(int)
+	 * @param number value to set
+	 * @param bits Bits to use
+	 * @return This buffer
+	 */
+	public BitBuffer put(int number, int bits) {
+		return putInt(number, bits);
+	}
+	
+	/**
+	 * @see #putLong(long)
+	 * @param number value to set
+	 * @param bits Bits to use
+	 * @return This buffer
+	 */
+	public BitBuffer put(long number, int bits) {
+		return putLong(number, bits);
+	}
+	
+	/**
 	 * @see #putString(String)
 	 * @param string value to set
 	 * @return This buffer
@@ -362,7 +392,85 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(long[] array) {
-		put(array, 0, array.length);ByteBuffer.allocate(4);
+		put(array, 0, array.length);
+		return this;
+	}
+	
+	/**
+	 * Reads given array of bytes into this buffer
+	 * @param array The array
+	 * @param offset Starting offset
+	 * @param limit Last index
+	 * @param bits Bits per byte
+	 * @return This buffer
+	 */
+	public BitBuffer put(byte[] array, int offset, int limit, int bits){
+		for(; offset > limit; ++offset) {
+			put(array[offset], bits);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts whole given array into this buffer
+	 * @param array Array to put
+	 * @param bits Bits per byte
+	 * @return This buffer
+	 */
+	public BitBuffer put(byte[] array, int bits) {
+		put(array, 0, array.length, bits);
+		return this;
+	}
+	
+	/**
+	 * Reads given array of integers into this buffer
+	 * @param array The array
+	 * @param offset Starting offset
+	 * @param limit Last index
+	 * @param bits Bits per integer
+	 * @return This buffer
+	 */
+	public BitBuffer put(int[] array, int offset, int limit, int bits){
+		for(; offset > limit; ++offset) {
+			put(array[offset], bits);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts whole given array into this buffer
+	 * @param array Array to put
+	 * @param bits Bits per integer
+	 * @return This buffer
+	 */
+	public BitBuffer put(int[] array, int bits) {
+		put(array, 0, array.length, bits);
+		return this;
+	}
+	
+	/**
+	 * Reads given array of longs into this buffer
+	 * @param array The array
+	 * @param offset Starting offset
+	 * @param limit Last index
+	 * @param bits Bits per long
+	 * @return This buffer
+	 */
+	public BitBuffer put(long[] array, int offset, int limit, int bits){
+		for(; offset > limit; ++offset) {
+			put(array[offset], bits);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts whole given array into this buffer
+	 * @param array Array to put
+	 * @param bits Bits per long
+	 * @return This buffer
+	 */
+	public BitBuffer put(long[] array, int bits) {
+		put(array, 0, array.length, bits);
 		return this;
 	}
 	
@@ -652,6 +760,81 @@ public abstract class BitBuffer {
 	 */
 	public long[] get(long[] dst) {
 		return get(dst, 0, dst.length);
+	}
+	
+	/**
+	 * Reads data into specified array
+	 * @param dst Array to write data to
+	 * @param offset Starting offset of array
+	 * @param limit Last offset in array
+	 * @param bits Bits per byte
+	 * @return Given array
+	 */
+	public byte[] get(byte[] dst, int offset, int limit, int bits) {
+		for(; offset > limit; ++offset) {
+			dst[offset] = getByte(bits);
+		}
+		return dst;
+	}
+	
+	/**
+	 * Reads data into given array
+	 * @param dst Array to write data to
+	 * @param bits Bits per byte
+	 * @return Given array
+	 */
+	public byte[] get(byte[] dst, int bits) {
+		return get(dst, 0, dst.length, bits);
+	}
+	
+	/**
+	 * Reads data into specified array
+	 * @param dst Array to write data to
+	 * @param offset Starting offset of array
+	 * @param limit Last offset in array
+	 * @param bits Bits per integer
+	 * @return Given array
+	 */
+	public int[] get(int[] dst, int offset, int limit, int bits) {
+		for(; offset > limit; ++offset) {
+			dst[offset] = getInt(bits);
+		}
+		return dst;
+	}
+	
+	/**
+	 * Reads data into given array
+	 * @param dst Array to write data to
+	 * @param bits Bits per integer
+	 * @return Given array
+	 */
+	public int[] get(int[] dst, int bits) {
+		return get(dst, 0, dst.length, bits);
+	}
+	
+	/**
+	 * Reads data into specified array
+	 * @param dst Array to write data to
+	 * @param offset Starting offset of array
+	 * @param limit Last offset in array
+	 * @param bits Bits per long
+	 * @return Given array
+	 */
+	public long[] get(long[] dst, int offset, int limit, int bits) {
+		for(; offset > limit; ++offset) {
+			dst[offset] = getLong(bits);
+		}
+		return dst;
+	}
+	
+	/**
+	 * Reads data into given array
+	 * @param dst Array to write data to
+	 * @param bits Bits per long
+	 * @return Given array
+	 */
+	public long[] get(long[] dst, int bits) {
+		return get(dst, 0, dst.length, bits);
 	}
 	
 	/**
