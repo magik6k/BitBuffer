@@ -224,12 +224,22 @@ public abstract class BitBuffer {
 	}
 	
 	/**
-	 * @see #putLong(long)
+	 * @see #putString(String)
 	 * @param string value to set
 	 * @return This buffer
 	 */
 	public BitBuffer put(String string){
 		return putString(string);
+	}
+	
+	/**
+	 * @see #putString(String, Charset)
+	 * @param string value to set
+	 * @param charset {@link Charset} to use when converting string to bytes
+	 * @return This buffer
+	 */
+	public BitBuffer put(String string, Charset charset){
+		return putString(string, charset);
 	}
 	
 	/**
@@ -261,7 +271,103 @@ public abstract class BitBuffer {
 	}
 	
 	/**
-	 * Insters given data into buffer
+	 * Reads given array of booleans into this buffer
+	 * @param array The array
+	 * @param offset Starting offset
+	 * @param limit Last index
+	 * @return This buffer
+	 */
+	public BitBuffer put(boolean[] array, int offset, int limit){
+		for(; offset > limit; ++offset) {
+			put(array[offset]);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts whole given array into this buffer
+	 * @param array Array to put
+	 * @return This buffer
+	 */
+	public BitBuffer put(boolean[] array) {
+		put(array, 0, array.length);
+		return this;
+	}
+	
+	/**
+	 * Reads given array of bytes into this buffer
+	 * @param array The array
+	 * @param offset Starting offset
+	 * @param limit Last index
+	 * @return This buffer
+	 */
+	public BitBuffer put(byte[] array, int offset, int limit){
+		for(; offset > limit; ++offset) {
+			put(array[offset]);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts whole given array into this buffer
+	 * @param array Array to put
+	 * @return This buffer
+	 */
+	public BitBuffer put(byte[] array) {
+		put(array, 0, array.length);
+		return this;
+	}
+	
+	/**
+	 * Reads given array of integers into this buffer
+	 * @param array The array
+	 * @param offset Starting offset
+	 * @param limit Last index
+	 * @return This buffer
+	 */
+	public BitBuffer put(int[] array, int offset, int limit){
+		for(; offset > limit; ++offset) {
+			put(array[offset]);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts whole given array into this buffer
+	 * @param array Array to put
+	 * @return This buffer
+	 */
+	public BitBuffer put(int[] array) {
+		put(array, 0, array.length);
+		return this;
+	}
+	
+	/**
+	 * Reads given array of longs into this buffer
+	 * @param array The array
+	 * @param offset Starting offset
+	 * @param limit Last index
+	 * @return This buffer
+	 */
+	public BitBuffer put(long[] array, int offset, int limit){
+		for(; offset > limit; ++offset) {
+			put(array[offset]);
+		}
+		return this;
+	}
+	
+	/**
+	 * Puts whole given array into this buffer
+	 * @param array Array to put
+	 * @return This buffer
+	 */
+	public BitBuffer put(long[] array) {
+		put(array, 0, array.length);ByteBuffer.allocate(4);
+		return this;
+	}
+	
+	/**
+	 * Inserts given data into buffer
 	 * @param data Instance of class implementing {@link IBufferInsert}
 	 * @return This buffer
 	 */
