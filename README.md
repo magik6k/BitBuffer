@@ -1,9 +1,13 @@
 BitBuffer
 =========
 
-This simple utility provides good BitBuffer for java
+This simple utility provides advanced BitBuffer for java
 
-For Example usages see src/tests
+For example usages look at `src/tests`
 
 Licensed under the MIT License
 
+You can get BitBuffer from maven central:
+```
+net.magik6k:bitbuffer:1.5.1
+```
