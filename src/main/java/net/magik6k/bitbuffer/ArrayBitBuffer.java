@@ -4,7 +4,7 @@ class ArrayBitBuffer extends SimpleBitBuffer{
 	private byte[] bytes;
 	
 	protected ArrayBitBuffer(long bits) {
-		bytes = new byte[(int) ((bits+(8L-bits%8L))/8L)];
+		bytes = new byte[(int) Math.ceil(bits / 8.d)];
 		limit = bits;
 	}
 	

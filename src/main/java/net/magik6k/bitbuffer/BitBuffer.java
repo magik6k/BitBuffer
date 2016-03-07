@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
  * @see #allocateDirect(long)
  */
 public abstract class BitBuffer {
+	protected abstract long rawLength();
+
 	/**
 	 * Puts boolean value(Single bit)
 	 * @param b value to set
@@ -856,13 +858,12 @@ public abstract class BitBuffer {
 	
 	/**
 	 * This method returns representation of this bufer as
-	 * array of bytes. nota that not-full bits will be set to 0.
+	 * array of bytes. note that missing bits will be set to 0.
 	 * This method shouldn't affect the position.
 	 * @return This BitBuffer represented as byte array
 	 */
 	public byte[] asByteArray(){
-		
-		byte[] result = new byte[(int) limit()];
+
 		long startPos = position();
 		boolean reflip = false;
 		if(!canRead()){
@@ -870,6 +871,7 @@ public abstract class BitBuffer {
 			reflip = true;
 		}
 		setPosition(0);
+		byte[] result = new byte[(int) rawLength()];
 		for(int i = 0; i*8 < limit(); ++i){
 			result[i] = getByte();
 		}
@@ -882,7 +884,7 @@ public abstract class BitBuffer {
 	
 	/**
 	 * This method returns representation of this bufer as
-	 * ByteBuffer. nota that not-full bits will be set to 0.
+	 * ByteBuffer. note that missing bits will be set to 0.
 	 * This method shouldn't affect the position.
 	 * @return ByteBuffer version of this class
 	 */

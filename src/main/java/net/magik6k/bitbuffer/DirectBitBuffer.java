@@ -27,7 +27,7 @@ class DirectBitBuffer extends SimpleBitBuffer{
 		unsafe = us;
 	}
 	protected DirectBitBuffer(long bits){
-		long bytes = (bits+(8-bits%8))/8;
+		long bytes = (long) Math.ceil(bits / 8.d);
 		try {
 			address = unsafe.allocateMemory(bytes);
 		} catch (OutOfMemoryError ex) {

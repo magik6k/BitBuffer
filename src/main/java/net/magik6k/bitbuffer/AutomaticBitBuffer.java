@@ -15,7 +15,7 @@ class AutomaticBitBuffer extends SimpleBitBuffer{
 	}
 	
 	private static long toBytes(long bits){
-		return (bits+(8-bits%8))/8;
+		return (int) Math.ceil(bits / 8.d);
 	}
 	
 	
@@ -43,7 +43,7 @@ class AutomaticBitBuffer extends SimpleBitBuffer{
 
 	@Override
 	protected long rawLength() {
-		return bytes.length*8;
+		return bytes.length;
 	}
 	
 }
