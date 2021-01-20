@@ -103,12 +103,12 @@ abstract class SimpleBitBuffer extends BitBuffer{
 
 	@Override
 	public long size() {
-		return rawLength();
+		return rawLength() * Byte.SIZE;
 	}
 
 	@Override
 	public long limit() {
-		return read ? limit : rawLength();
+		return read ? limit : rawLength() * Byte.SIZE;
 	}
 
 	@Override
