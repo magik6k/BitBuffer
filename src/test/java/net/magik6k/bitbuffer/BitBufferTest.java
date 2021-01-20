@@ -191,6 +191,21 @@ public class BitBufferTest {
 		assertHex(-2346798, buffer.getInt());
 		assertHex(29, buffer.getInt());
 	}
+
+	@Test
+	public void basicShortTest(){
+		BitBuffer buffer = BitBuffer.allocate(128);
+
+		buffer.putShort((short) 0xF1F1);
+		buffer.putShort((short) 0x0910);
+		buffer.putShort((short) 29);
+
+		buffer.flip();
+
+		assertHex(0xF1F1, buffer.getShort());
+		assertHex(0x0910, buffer.getShort());
+		assertHex(29, buffer.getShort());
+	}
 	
 	@Test
 	public void mixedByteTest(){
