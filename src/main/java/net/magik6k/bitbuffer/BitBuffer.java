@@ -346,7 +346,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(ByteBuffer buffer){
-		while(buffer.remaining() > 1){
+		while(buffer.hasRemaining()){
 			this.put(buffer.get());
 		}
 		return this;

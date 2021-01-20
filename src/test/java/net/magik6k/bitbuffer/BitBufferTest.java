@@ -3,6 +3,7 @@ package net.magik6k.bitbuffer;
 import static org.junit.Assert.*;
 
 import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
 
 import net.magik6k.bitbuffer.BitBuffer;
 
@@ -206,7 +207,27 @@ public class BitBufferTest {
 		assertHex(0x0910, buffer.getShort());
 		assertHex(29, buffer.getShort());
 	}
-	
+
+	@Test
+	public void basicByteBufferTest(){
+		ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+		BitBuffer bitBuffer = BitBuffer.allocate(128);
+
+		byteBuffer.put((byte) 0x12);
+		byteBuffer.put((byte) 0x15);
+		byteBuffer.put((byte) 0x09);
+		byteBuffer.put((byte) 0x99);
+		byteBuffer.rewind();
+
+		bitBuffer.put(byteBuffer);
+		bitBuffer.flip();
+
+		assertBits((byte)0x12, bitBuffer.getByte());
+		assertBits((byte)0x15, bitBuffer.getByte());
+		assertBits((byte)0x09, bitBuffer.getByte());
+		assertBits((byte)0x99, bitBuffer.getByte());
+	}
+
 	@Test
 	public void mixedByteTest(){
 		BitBuffer buffer = BitBuffer.allocate(16);
