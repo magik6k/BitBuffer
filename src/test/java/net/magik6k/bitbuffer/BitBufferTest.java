@@ -466,6 +466,15 @@ public class BitBufferTest {
         assertEquals(2, buffer.asByteArray().length);
     }
 
+	@Test
+	public void arrayPutBooleanTest() {
+		BitBuffer buffer = BitBuffer.allocate(8);
+		buffer.put(new boolean[] { true, false, true, true, false, false, true, true });
+		assertEquals(8, buffer.position());
+		buffer.flip();
+		assertArrayEquals(buffer.asByteArray(), new byte[] { (byte) 0b10110011} );
+	}
+
 	public static void assertHex(long expected, long actual){
 		if(expected != actual)
 			throw new AssertionError("expected:<"+"0x" + Long.toHexString(expected)
