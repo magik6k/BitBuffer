@@ -62,8 +62,8 @@ public class BitBufferTest {
 		
 		buffer.flip();
 		
-		assertEquals(1234567890.12345, buffer.getDouble());
-		assertEquals(4572145.34653625, buffer.getDouble());
+		assertEquals(1234567890.12345, buffer.getDouble(), 0.0F);
+		assertEquals(4572145.34653625, buffer.getDouble(), 0.0F);
 	}
 	
 	@Test
