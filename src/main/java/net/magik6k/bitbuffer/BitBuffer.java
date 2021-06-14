@@ -44,7 +44,18 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public abstract BitBuffer putByte(byte b, int bits);
-	
+
+	/**
+	 * Puts signed short value(16 bits)
+	 * @param i value to set
+	 * @return This buffer
+	 */
+	public BitBuffer putShort(short i){
+		putByte((byte)((i&0xFF00)>>>8));
+		putByte((byte) (i&0x00FF));
+		return this;
+	}
+
 	/**
 	 * Puts signed integer value(32 bits)
 	 * @param i value to set
@@ -74,7 +85,28 @@ public abstract class BitBuffer {
 		putByte((byte) (l&0x00000000000000FFL));
 		return this;
 	}
-	
+
+	/**
+	 * Puts short value with specified bit count. Note that this
+	 * method can be used with both signed and unsigned data.
+	 * @param i value to set
+	 * @param bits Number of bits to use
+	 * @return This buffer
+	 */
+	public BitBuffer putShort(short i, int bits){
+		if(bits == 0)return this;
+		do{
+			if(bits > 7){
+				putByte((byte) ((i&(0xFF << (bits - 8))) >>> (bits - 8) ));
+				bits -= 8;
+			}else{
+				putByte((byte) (i & (0xFF >> -(bits - 8))), bits);
+				bits = 0;
+			}
+		}while(bits > 0);
+		return this;
+	}
+
 	/**
 	 * Puts integer value with specified bit count. Note that this
 	 * method can be used with both signed and unsigned data.
@@ -206,7 +238,16 @@ public abstract class BitBuffer {
 	public BitBuffer put(byte number){
 		return putByte(number);
 	}
-	
+
+	/**
+	 * @see #putShort(short)
+	 * @param number value to set
+	 * @return This buffer
+	 */
+	public BitBuffer put(short number) {
+		return putShort(number);
+	}
+
 	/**
 	 * @see #putInt(int)
 	 * @param number value to set
@@ -234,7 +275,16 @@ public abstract class BitBuffer {
 	public BitBuffer put(byte number, int bits){
 		return putByte(number, bits);
 	}
-	
+
+	/**
+	 * @see #putShort(short)
+	 * @param number value to set
+	 * @return This buffer
+	 */
+	public BitBuffer put(short number, int bits) {
+		return putShort(number, bits);
+	}
+
 	/**
 	 * @see #putInt(int)
 	 * @param number value to set
@@ -296,7 +346,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(ByteBuffer buffer){
-		while(buffer.remaining() > 1){
+		while(buffer.hasRemaining()){
 			this.put(buffer.get());
 		}
 		return this;
@@ -310,7 +360,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(boolean[] array, int offset, int limit){
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			put(array[offset]);
 		}
 		return this;
@@ -334,7 +384,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(byte[] array, int offset, int limit){
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			put(array[offset]);
 		}
 		return this;
@@ -358,7 +408,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(int[] array, int offset, int limit){
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			put(array[offset]);
 		}
 		return this;
@@ -382,7 +432,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(long[] array, int offset, int limit){
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			put(array[offset]);
 		}
 		return this;
@@ -407,7 +457,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(byte[] array, int offset, int limit, int bits){
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			put(array[offset], bits);
 		}
 		return this;
@@ -433,7 +483,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(int[] array, int offset, int limit, int bits){
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			put(array[offset], bits);
 		}
 		return this;
@@ -459,7 +509,7 @@ public abstract class BitBuffer {
 	 * @return This buffer
 	 */
 	public BitBuffer put(long[] array, int offset, int limit, int bits){
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			put(array[offset], bits);
 		}
 		return this;
@@ -507,14 +557,63 @@ public abstract class BitBuffer {
 	 * @return Unsigned Byte value of given bit width
 	 */
 	public abstract byte getByteUnsigned(int bits);
-	
+
+	/**
+	 * @return 16 bit signed short value
+	 */
+	public int getShort(){
+		return (((getByte()&0xFF) << 8) | (getByte()&0xFF));
+	}
+
+	/**
+	 * @param bits Length of short
+	 * @return Short value of given bit width
+	 */
+	public int getShort(int bits){
+		if(bits == 0)return 0;
+		boolean sign = getBoolean();
+		int inBits = --bits;
+
+		int res = 0;
+		do {
+			if(bits > 7){
+				res = (res << 8) | (getByte()&0xFF);
+				bits -= 8;
+			}else{
+				res = (res << bits) + (getByteUnsigned(bits)&0xFF);
+				bits -= bits;
+			}
+		}while(bits > 0);
+
+		return (short) (sign ? (0xFFFFFFFF << inBits) | res : res);
+	}
+
+	/**
+	 * @param bits Length of short
+	 * @return Unsigned Short value of given bit width
+	 */
+	public short getShortUnsigned(int bits){
+		if(bits == 0)return 0;
+		short res = 0;
+		do {
+			if(bits > 7){
+				res = (short) ((res << 8) | (getByte()&0xFF));
+				bits -= 8;
+			}else{
+				res = (short) ((res << bits) + (getByteUnsigned(bits)&0xFF));
+				bits -= bits;
+			}
+		}while(bits > 0);
+		return res;
+	}
+
 	/**
 	 * @return 32 bit signed integer value
 	 */
 	public int getInt(){
 		return ((getByte()&0xFF) << 24) | ((getByte()&0xFF) << 16) | ((getByte()&0xFF) << 8) | (getByte()&0xFF);
 	}
-	
+
 	/**
 	 * @param bits Length of integer
 	 * @return Signed integer value of given bit width
@@ -680,7 +779,7 @@ public abstract class BitBuffer {
 	 * @return Given array
 	 */
 	public boolean[] get(boolean[] dst, int offset, int limit) {
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			dst[offset] = getBoolean();
 		}
 		return dst;
@@ -703,7 +802,7 @@ public abstract class BitBuffer {
 	 * @return Given array
 	 */
 	public byte[] get(byte[] dst, int offset, int limit) {
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			dst[offset] = getByte();
 		}
 		return dst;
@@ -726,7 +825,7 @@ public abstract class BitBuffer {
 	 * @return Given array
 	 */
 	public int[] get(int[] dst, int offset, int limit) {
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			dst[offset] = getInt();
 		}
 		return dst;
@@ -749,7 +848,7 @@ public abstract class BitBuffer {
 	 * @return Given array
 	 */
 	public long[] get(long[] dst, int offset, int limit) {
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			dst[offset] = getLong();
 		}
 		return dst;
@@ -773,7 +872,7 @@ public abstract class BitBuffer {
 	 * @return Given array
 	 */
 	public byte[] get(byte[] dst, int offset, int limit, int bits) {
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			dst[offset] = getByte(bits);
 		}
 		return dst;
@@ -798,7 +897,7 @@ public abstract class BitBuffer {
 	 * @return Given array
 	 */
 	public int[] get(int[] dst, int offset, int limit, int bits) {
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			dst[offset] = getInt(bits);
 		}
 		return dst;
@@ -823,7 +922,7 @@ public abstract class BitBuffer {
 	 * @return Given array
 	 */
 	public long[] get(long[] dst, int offset, int limit, int bits) {
-		for(; offset > limit; ++offset) {
+		for(; offset < limit; ++offset) {
 			dst[offset] = getLong(bits);
 		}
 		return dst;

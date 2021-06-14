@@ -1,7 +1,7 @@
 package net.magik6k.bitbuffer;
 
 class ArrayBitBuffer extends SimpleBitBuffer{
-	private byte[] bytes;
+	private final byte[] bytes;
 	
 	protected ArrayBitBuffer(long bits) {
 		bytes = new byte[(int) Math.ceil(bits / 8.d)];
